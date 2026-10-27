@@ -26,7 +26,8 @@ html {{ font-size: 125%; }}
 html, body, [class*="css"] {{
     font-family: "Segoe UI", "Segoe UI Variable Display", Arial, sans-serif;
 }}
-#MainMenu, footer, header[data-testid="stHeader"] {{ visibility: hidden; height: 0; }}
+#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] {{ visibility: hidden; }}
+header[data-testid="stHeader"] {{ background: transparent; }}
 .block-container {{ padding: 1.2rem 2rem 2rem 2rem; max-width: 100%; }}
 
 /* Sidebar */
