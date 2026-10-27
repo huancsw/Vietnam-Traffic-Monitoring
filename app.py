@@ -67,18 +67,25 @@ def process_video(uploaded_video, model, threshold, record, counters, space_img,
     with tempfile.NamedTemporaryFile(suffix=Path(uploaded_video.name).suffix, delete=False) as temp_file:
         temp_file.write(uploaded_video.read())
     vid = cv2.VideoCapture(temp_file.name)
+    fps = vid.get(cv2.CAP_PROP_FPS) or 20.0
 
     out_video = None
     if record:
         OUTPUT_VIDEO.parent.mkdir(exist_ok=True)
         width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = vid.get(cv2.CAP_PROP_FPS) or 20.0
         out_video = cv2.VideoWriter(str(OUTPUT_VIDEO), cv2.VideoWriter_fourcc(*"XVID"), fps, (width, height))
 
     try:
-        while vid.isOpened():
-            ret, frame = vid.read()
+        start = time.time()
+        frame_index = 0
+        while vid.grab():
+            frame_index += 1
+            # Drop frames when detection is slower than the video so playback stays real time
+            if not record and time.time() - start > frame_index / fps:
+                continue
+
+            ret, frame = vid.retrieve()
             if not ret:
                 break
 
